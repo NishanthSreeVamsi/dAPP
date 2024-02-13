@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Market DApp</title>
+
+    <!-- Include Web3.js -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.3.6/dist/web3.min.js"></script>
+
+    <!-- Your JavaScript code -->
+    <script type="text/javascript">
+        // Connect to the Ethereum network using Web3
+        
+        const web3 = new Web3(Web3.givenProvider || "http://localhost:8545"); // Use your Ethereum node URL
+        const contractAddress = "0x7175632DcDf58B6a9d9be6aefcf8da0806437fdE"; // Replace with the actual contract address
+        const contractAbi = [
+    {
+      "inputs": [],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "farmer",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "pricePerUnit",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "quantity",
+          "type": "uint256"
+        }
+      ],
+      "name": "CropAdded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "consumer",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "quantity",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "totalPrice",
+          "type": "uint256"
+        }
+      ],
+      "name": "CropPurchased",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "crops",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "farmer",
+          "type": "address"
+        },
+        {
+          "internalType": "string",
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "pricePerUnit",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "quantity",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "farmerCrops",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "_name",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_pricePerUnit",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_quantity",
+          "type": "uint256"
+        }
+      ],
+      "name": "addCrop",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_quantity",
+          "type": "uint256"
+        }
+      ],
+      "name": "buyCrop",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function",
+      "payable": true
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_id",
+          "type": "uint256"
+        }
+      ],
+      "name": "getCrop",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        },
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [],
+      "name": "getTotalCrops",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [],
+      "name": "withdrawFunds",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "withdraw",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ]; // Replace with the actual contract ABI
+
+        const cropMarketContract = new web3.eth.Contract(contractAbi, contractAddress);
+             // Function to add a crop to the market
+    //   async function addCrop() {
+            // const cropName = document.getElementById("cropName").value;
+            // const pricePerUnit = document.getElementById("pricePerUnit").value;
+            // const quantity = document.getElementById("quantity").value;
+            
+            // await cropMarketContract.methods.addCrop(cropName, pricePerUnit, quantity).send({ from: web3.eth.defaultAccount });
+            // displayCrops();
+            
+        // }
+        async function addCrop() {
+    const cropName = document.getElementById("cropName").value;
+    const pricePerUnit = document.getElementById("pricePerUnit").value;
+    const quantity = document.getElementById("quantity").value;
+
+    // Get the current user's Ethereum address (you might want to replace this with your own logic)
+    const accounts = await web3.eth.getAccounts();
+    const fromAddress = accounts[0]; // Assuming the user's address is at index 0
+
+    // // Call the contract's addCrop method and specify the "from" address in the options
+    // await cropMarketContract.methods.addCrop(cropName, pricePerUnit, quantity)
+    //     .send({ from: fromAddress }); // Specify the "frome" address here
+    await cropMarketContract.methods.addCrop(cropName, pricePerUnit, quantity)
+    .send({ from: fromAddress, gas: 2000000 }); // Specify the gas limit here
+
+
+    displayCrops();
+}
+
+      
+
+        // Function to display the list of crops
+        async function displayCrops() {
+            const cropListElement = document.getElementById("cropList");
+            cropListElement.innerHTML = "Initial"; // Clear previous list
+            
+            const totalCrops = await cropMarketContract.methods.getTotalCrops().call();
+            for (let i = 0; i < totalCrops; i++) {
+                const crop = await cropMarketContract.methods.getCrop(i).call();
+                cropListElement.innerHTML += `<li>${crop[2]} - Price: ${crop[3]} - Quantity: ${crop[4]}</li>`;
+            }
+        }
+   
+        // Initial display of crops when the page loads
+        displayCrops();
+        document.addEventListener('DOMContentLoaded', displayCrops);
+     
+    </script>
+</head>
+<body>
+
+<h1>Crop Market DApp</h1>
+
+<!-- Add Crop Form -->
+<h2>Add Crop</h2>
+<form id="addCropForm">
+    <label for="cropName">Crop Name:</label>
+    <input type="text" id="cropName" required><br>
+
+    <label for="pricePerUnit">Price Per Unit:</label>
+    <input type="number" id="pricePerUnit" required><br>
+
+    <label for="quantity">Quantity:</label>
+    <input type="number" id="quantity" required><br>
+
+    <button type="button" onclick="addCrop()">Add Crop</button>
+</form>
+
+<!-- Crop List -->
+<h2>Crop List</h2>
+<ul id="cropList"></ul>
+
+</body>
+</html>
